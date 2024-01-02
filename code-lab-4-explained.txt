@@ -1,0 +1,99 @@
+./pipe_1 :
+i) Creates N (given as argument) number of child processes, each sending a formatted message through a pipe to the parent process, which reads and prints the messages received from the children.
+ii) Output (using N=3 as example):
+        Creating 3 children
+        FATHER: I received from children:
+
+        Hello from child  1 (pid=12345)
+        Hello from child  2 (pid=12346)
+        Hello from child  3 (pid=12347)
+iii) The child function is designed to be executed by each child process. It takes an index i and an array pd representing a pipe (file descriptors for reading and writing) and then writes a formatted message to the pipe using write.
+     The main function takes the number of child processes (N) as a command line argument, a pipe is created using the pipe system call, and file descriptors for the pipe are stored in the array pd,The program uses a loop to create N child processes using the fork system call.
+     Each child process executes the child function and then exits. The parent process closes the writing end of the pipe (pd[1]) and reads messages from the reading end (pd[0]). The received messages are printed to the standard output.
+
+
+
+
+./pipe_2 :
+i)Creates a pipe and forks a child process. The parent process writes a message to the pipe, and the child process reads from the pipe and writes the received message to the standard output.
+ii) Output:
+        message through pipe
+iii) The main function declares variables, including an array line to store the message and an array fd to hold file descriptors for the pipe.
+     A pipe is created using the pipe system call, and error checking is performed and the program forks a child process using the fork system call.
+     In the parent process, it closes the reading end of the pipe (fd[0]), writes a message to the pipe using write, and then closes the writing end of the pipe (fd[1]).
+     In the child process, it closes the writing end of the pipe (fd[1]), reads from the pipe using read, writes the received message to the standard output (STDOUT_FILENO), and then closes the reading end of the pipe (fd[0]).
+
+
+./signal :
+i)Executes a specified command, setting an alarm to terminate the child process after a given duration, and handles the termination or errors accordingly.
+ii) Output:
+           If the child process runs successfully, the program prints the command being executed.
+           If the child process is terminated due to the alarm, it prints an "Alarm received" message.
+           If the child process is killed (terminated by the parent process), it prints a "Child process killed" message.
+iii) The onalarm function is defined to handle the SIGALRM signal. It prints a message when the signal is received and sends a SIGKILL signal to terminate the child process.
+     The main function takes command line arguments, where an optional -n argument specifies the number of seconds before the child process is terminated. The program checks the command line arguments and extracts the duration for the alarm and then forks a child process,
+     and in the child process, it executes the command specified in the command line arguments using execvp. In the parent process, it sets up a signal handler for SIGALRM using the signal function.
+     An alarm is set using the alarm function to send a SIGALRM signal after the specified duration.
+     The parent process waits for the child process to finish, and if the child is killed or encounters an error, it prints a corresponding message.
+
+
+
+
+./immun2ctrlC :
+i) Sets a signal handler to ignore the SIGINT (Ctrl+C) signal, prints a message indicating the sleep duration, and then sleeps for the specified number of seconds obtained from the command line argument.
+ii) Output (using 5 as input example):
+        sleeping for: 5 sec
+iii) The signal command makes it immune to Ctrl+C, and the sleep command makes it sleep for t seconds, where t is a given argument.
+
+
+
+
+./example_sleep :
+i) Sets up a signal handler for the SIGINT (Ctrl+C) signal and enters into an infinite loop where it repeatedly prints a message and sleeps for one second. When the program receives a Ctrl+C signal it prints a message and the program to exits.
+ii) Output varies depending on how long user waits before pressing Ctrl+C. Example for 3 seconds:
+        Going to sleep for a second...
+        Going to sleep for a second...
+        Going to sleep for a second...
+        ^CCaught signal 2, coming out...
+iii) The sighandler function is defined to handle the SIGINT signal (Ctrl+C). It prints a message indicating the signal caught and exits the program with an exit status of 1.
+     The main function sets up a signal handler for SIGINT using the signal function. It enters an infinite loop where it prints a message and sleeps for one second.
+
+
+
+
+./example_pause :
+i) Sets up a signal handler for the SIGALRM signal and uses the alarm function to send a SIGALRM signal to the process after a specified duration. It prints the timestamp and then enters a pause, during which it waits for a signal to interrupt the pause after which tt prints another timestamp.
+ii) Output:
+        The time before pause is <current time>
+        Signal catcher called for signal 14
+        The time after pause is <current time>
+iii) The catcher function is defined to handle the SIGALRM signal. It prints a message indicating that the signal catcher has been called.
+     The timestamp function is defined to print the current time with a given label.
+     The main function takes a command line argument for the duration of the alarm (t). It sets up a signal handler for SIGALRM using the signal function. The alarm function is called to schedule a SIGALRM signal to be sent to the process after the specified duration (t) in seconds.
+     The timestamp function is called to print the current time before entering the pause. The pause function is used, which waits until a signal is received. After receiving a signal, the timestamp function is called again to print the current time after the pause.
+
+
+
+
+./example_kill :
+i) Sends multiple SIGUSR1 signals to the same process using the kill function and counts the number of signals caught by a custom signal handler.
+ii) Output for ( using 10 as input):
+        Back in main
+        The kill() function was called 10 times
+        The signal catching function was called 10 times
+iii) The global variable sigcount is declared to count the number of times the signal handler (catcher) is called.
+     The catcher function is defined to handle the SIGUSR1 signal. It increments the sigcount variable.
+     The sendsig function takes an argument count and sends SIGUSR1 signals to the current process using the kill function. It returns the count of signals sent.
+     The main function takes a command line argument (iter) representing the number of times to send SIGUSR1 signals. It sets up a signal handler for SIGUSR1 using the signal function. The sendsig function is called to send SIGUSR1 signals to the process.
+     The program prints the number of times the kill function was called and the number of times the signal handler was called.
+
+
+
+
+./Makeall :
+i) Compile the set of C programs. It provides rules to build several executable files from their corresponding C source files.
+ii) Doesn't have an output but it creates executable files in the same directory.
+iii) It first defines the shell used, the compiler command and the file removal command. It then lists the target executable files to be build.
+     The command to build it is $(CC) $< -o $@, which essentially runs the C compiler (gcc) for the indicated file and outputs the executable.
+     clean: Defines a target named "clean" to remove object files, backup files, and the executables listed in $(EXECUTABLES).
+
